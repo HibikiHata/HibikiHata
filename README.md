@@ -59,21 +59,25 @@
 
 <div align="center">
 
-<table>
+<table border="0">
 <tr>
-<td width="200" align="center">
+<td width="200" align="center" valign="middle">
 <img src="https://skillicons.dev/icons?i=github" width="100" height="100" alt="Github" />
-<br><strong>Github</strong>
+<br><strong>HibikiHata</strong>
 </td>
-<td width="400" align="left">
+<td width="500" align="left" valign="top">
 
-### 👋 **Hi, I'm a Github User!**
-🚀 **Software Developer** passionate about mobile development  
+<br>
+<h3>👋 Hi, I'm HibikiHata!</h3>
 
-🌍 **Location:** Japan 🇯🇵  
-💼 **Focus:** Building & Designing
-☕ **Powered by:** Coffee and Curiosity  
-🎯 **Goal:** Creating amazing user experiences  
+<p>
+🚀 <b>Software Developer</b> passionate about productivity systems<br>
+<br>
+🌍 <b>Location:</b> Japan 🇯🇵<br>
+💼 <b>Focus:</b> Building & Designing <b>LifeOS</b><br>
+☕ <b>Powered by:</b> Logic and Curiosity<br>
+🎯 <b>Goal:</b> Creating amazing user experiences<br>
+</p>
 
 </td>
 </tr>

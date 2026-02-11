@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white" />
   <img src="https://img.shields.io/badge/laravel-%23FF2D20.svg?style=for-the-badge&logo=laravel&logoColor=white" />
   <img src="https://img.shields.io/badge/ros-%230A0FF9.svg?style=for-the-badge&logo=ros&logoColor=white" />
-  <br>
+
   <img src="https://img.shields.io/badge/Unity-Developer-000000?style=for-the-badge&logo=unity" alt="Unity"/>
   <img src="https://img.shields.io/badge/Invest-Analytics-00C805?style=for-the-badge&logo=google-sheets" alt="Invest"/>
 

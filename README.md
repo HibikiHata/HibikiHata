@@ -28,7 +28,7 @@
   <a href="https://github.com/sponsors/HibikiHata">
     <img src="https://img.shields.io/badge/Sponsor-GitHub-%23EA4AAA?style=for-the-badge&logo=github-sponsors" alt="GitHub Sponsors" />
   </a>
-  <a href="https://buymeacoffee.com/hibikihata">
+  <a href="https://buymeacoffee.com/neo001">
     <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me a Coffee" />
   </a>
 </div>

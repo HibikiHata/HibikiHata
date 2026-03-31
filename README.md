@@ -4,7 +4,6 @@
   <samp>
     "Productivity Hub: Centralizing Life Logs and Orchestrating AI-Driven Integration."
   </samp>
-  <br><br>
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/HibikiHata/HibikiHata/output/github-snake-dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/HibikiHata/HibikiHata/output/github-snake.svg">

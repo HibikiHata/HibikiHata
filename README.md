@@ -9,7 +9,6 @@
     <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/HibikiHata/HibikiHata/output/github-snake.svg">
     <img alt="github contribution grid snake animation" src="https://raw.githubusercontent.com/HibikiHata/HibikiHata/output/github-snake.svg" width="700">
   </picture>
-  <br><br>
 </div>
 
 <div align="center">

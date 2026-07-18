@@ -7,7 +7,7 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/HibikiHata/HibikiHata/output/github-snake-dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/HibikiHata/HibikiHata/output/github-snake.svg">
-    <img alt="github contribution grid snake animation" src="https://raw.githubusercontent.com/HibikiHata/HibikiHata/output/github-snake.svg" width="700">
+    <img alt="github contribution grid snake animation" src="https://raw.githubusercontent.com/HibikiHata/HibikiHata/output/github-snake.svg" width="100%">
   </picture>
   <div align="left">
   <h2>👋 About / Now</h2>

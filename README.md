@@ -52,12 +52,8 @@ Personal productivity plugin for Claude Code — adaptive skills that learn your
   <img src="https://img.shields.io/badge/Unity-Developer-000000?style=for-the-badge&logo=unity" alt="Unity"/>
   <img src="https://img.shields.io/badge/Invest-00C805?style=for-the-badge&logo=google-sheets" alt="Invest"/>
   <br>
-  <a href="https://github.com/sponsors/HibikiHata">
-    <img src="https://img.shields.io/badge/Sponsor-GitHub-%23EA4AAA?style=for-the-badge&logo=github-sponsors" alt="GitHub Sponsors" />
-  </a>
-  <a href="https://buymeacoffee.com/neo001">
-    <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me a Coffee" />
-  </a>
+  <a href="https://github.com/sponsors/HibikiHata"><img src="https://img.shields.io/badge/Sponsor-GitHub-%23EA4AAA?style=for-the-badge&logo=github-sponsors" alt="GitHub Sponsors" /></a>
+  <a href="https://buymeacoffee.com/neo001"><img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me a Coffee" /></a>
   <img src="https://komarev.com/ghpvc/?username=HibikiHata&label=SYSTEM+ACCESS&style=for-the-badge&color=58A6FF" alt="System Access" />
 </div>
 

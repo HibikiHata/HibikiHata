@@ -46,6 +46,7 @@ Personal productivity plugin for Claude Code — adaptive skills that learn your
     <img alt="Quotes" src="https://quotes-github-readme.vercel.app/api?type=horizontal&theme=catppuccin_mocha">
   </picture>
   <br>
+  <br>
   <img src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54" />
   <img src="https://img.shields.io/badge/GitHub-LifeOS-181717?style=for-the-badge&logo=github" alt="GitHub"/>
   <img src="https://img.shields.io/badge/ros-%230A0FF9.svg?style=for-the-badge&logo=ros&logoColor=white" />

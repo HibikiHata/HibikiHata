@@ -68,6 +68,8 @@ Personal productivity plugin for Claude Code — adaptive skills that learn your
 - [**pomodoro-svg**](https://github.com/HibikiHata/pomodoro-svg) — the timer starts when the page is painted. No JS, no server
 - [**game-of-life-svg**](https://github.com/HibikiHata/game-of-life-svg) — precomputed Game of Life animations in pure SVG/CSS · <a href="https://github.com/marketplace/actions/game-of-life-svg">Marketplace</a>
 
+<img src="assets/pixel.png" width="2000" height="1" alt="">
+
 </td>
 </tr>
 </table>

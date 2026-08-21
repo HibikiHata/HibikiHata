@@ -63,6 +63,8 @@ Personal productivity plugin for Claude Code — adaptive skills that learn your
 <tr>
 <td colspan="2">
 
+<img src="assets/pixel.png" width="2000" height="1" alt="">
+
 - [**core-nexus**](https://github.com/HibikiHata/core-nexus) — personal productivity plugin for Claude Code
 - [**almanac-calendar**](https://github.com/HibikiHata/almanac-calendar) — deterministic calendar SVG, stdlib only, no external APIs · <a href="https://github.com/marketplace/actions/almanac-calendar">Marketplace</a>
 - [**pomodoro-svg**](https://github.com/HibikiHata/pomodoro-svg) — the timer starts when the page is painted. No JS, no server

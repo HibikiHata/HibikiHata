@@ -39,6 +39,39 @@ Personal productivity plugin for Claude Code — adaptive skills that learn your
 </tr>
 </table>
 
+## 🧩 Live Widgets
+<table>
+<tr>
+<td align="center" width="33%">
+
+<a href="https://github.com/HibikiHata/almanac-calendar">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/HibikiHata/almanac-calendar/output/calendar-moon-dark.svg">
+    <img alt="Monthly calendar with rokuyō and moon phases — almanac-calendar" width="300" src="https://raw.githubusercontent.com/HibikiHata/almanac-calendar/output/calendar-moon-light.svg">
+  </picture>
+</a>
+
+<sub><a href="https://github.com/HibikiHata/almanac-calendar"><strong>almanac-calendar</strong></a><br>Rokuyō, solar terms, moon phase, holidays</sub>
+
+</td>
+<td align="center" width="70%" valign="middle">
+
+<sub>◌<br><br><em>next widget</em></sub>
+
+</td>
+</tr>
+<tr>
+<td colspan="2">
+
+- [**core-nexus**](https://github.com/HibikiHata/core-nexus) — personal productivity plugin for Claude Code
+- [**almanac-calendar**](https://github.com/HibikiHata/almanac-calendar) — deterministic calendar SVG, stdlib only, no external APIs · <a href="https://github.com/marketplace/actions/almanac-calendar">Marketplace</a>
+- [**pomodoro-svg**](https://github.com/HibikiHata/pomodoro-svg) — the timer starts when the page is painted. No JS, no server
+- [**game-of-life-svg**](https://github.com/HibikiHata/game-of-life-svg) — precomputed Game of Life animations in pure SVG/CSS · <a href="https://github.com/marketplace/actions/game-of-life-svg">Marketplace</a>
+
+</td>
+</tr>
+</table>
+
 <div align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://quotes-github-readme.vercel.app/api?type=horizontal&theme=catppuccin_mocha">

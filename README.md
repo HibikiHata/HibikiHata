@@ -54,7 +54,7 @@ Personal productivity plugin for Claude Code — adaptive skills that learn your
 <sub><a href="https://github.com/HibikiHata/almanac-calendar"><strong>almanac-calendar</strong></a><br>Rokuyō, solar terms, moon phase, holidays</sub>
 
 </td>
-<td align="center" width="70%" valign="middle">
+<td align="center" width="67%" valign="middle">
 
 <sub>◌<br><br><em>next widget</em></sub>
 

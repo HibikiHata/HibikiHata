@@ -40,7 +40,7 @@ Personal productivity plugin for Claude Code — adaptive skills that learn your
 </table>
 
 ## 🧩 Live Widgets
-<table>
+<table width="100%">
 <tr>
 <td align="center" width="33%">
 

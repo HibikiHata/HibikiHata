@@ -1,0 +1,8 @@
+# SHA でピン留めした Action 参照を、新しいコミットへ更新する PR を自動で作る。
+# ピンは放置すると陳腐化するので、ピン留め運用とこの監視は対で入れる。
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

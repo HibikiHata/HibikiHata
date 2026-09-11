@@ -12,7 +12,7 @@
   <div align="left">
   <h2>👋 About / Now</h2>
   <p>I'm a <strong>Developer Advocate</strong>, building <strong>LifeOS</strong> — a system to integrate thought, knowledge, action, and life into one place. I care about turning daily logs into leverage: AI-driven workflows, a second brain, and simulation as tools to think better and act faster.</p>
-  <p><strong>Now:</strong> architecting the LifeOS memory layer and orchestrating multi-model AI pipelines.</p>
+  <p><strong>Now:</strong> architecting the LifeOS memory layer, orchestrating multi-model AI pipelines, and shipping Obsidian plugins.</p>
   </div>
 </div>
 
@@ -69,6 +69,7 @@ Personal productivity plugin for Claude Code — adaptive skills that learn your
 - [**almanac-calendar**](https://github.com/HibikiHata/almanac-calendar) — deterministic calendar SVG, stdlib only, no external APIs · <a href="https://github.com/marketplace/actions/almanac-calendar">Marketplace</a>
 - [**pomodoro-svg**](https://github.com/HibikiHata/pomodoro-svg) — the timer starts when the page is painted. No JS, no server
 - [**game-of-life-svg**](https://github.com/HibikiHata/game-of-life-svg) — precomputed Game of Life animations in pure SVG/CSS · <a href="https://github.com/marketplace/actions/game-of-life-svg">Marketplace</a>
+- [**vault-arcade**](https://github.com/HibikiHata/vault-arcade) — Snake, 2048, Blocks, and Minesweeper inside Obsidian, keyboard or touch, offline · Obsidian community plugin
 
 <img src="assets/pixel.png" width="2000" height="1" alt="">
 

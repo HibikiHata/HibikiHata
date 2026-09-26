@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rdap.org answers 404 for registered .me domains — Hibiki Hata</title>
+<meta name="description" content=".me is not listed in the IANA RDAP bootstrap file, so rdap.org answers 404 even for registered .me names. How to tell the two apart, and what to check instead.">
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<header>
+  <a href="/">Hibiki Hata</a>
+  <nav aria-label="Site"><a href="/about/">About</a> · <a href="/contact/">Contact</a></nav>
+</header>
+<main>
+  <h1>rdap.org answers 404 for registered .me domains</h1>
+  <p><small>Last updated 2026-09-26</small></p>
+
+  <p><strong>Conclusion.</strong> A <code>404</code> from <code>rdap.org</code> for a <code>.me</code> name does not mean the name is free. The <code>.me</code> back-end operator runs an RDAP server, but it is not listed in IANA's RDAP bootstrap file, so <code>rdap.org</code> has no server to forward the query to and answers <code>404</code> itself — the same status code a genuinely unregistered name gets. You can tell the two apart by whether <code>rdap.org</code> redirected. For <code>.me</code>, check WHOIS, the back-end operator's RDAP server directly, or a registrar's search instead. This holds as of September 2026 (<code>dns.json</code> edition 2026-09-16) and ends if <code>.me</code> is added to that file.</p>
+
+  <h2>Evidence</h2>
+  <p>Measured 2026-09-25 and 2026-09-26.</p>
+  <table>
+    <thead><tr><th>Query</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td><code>rdap.org</code> → <code>hibiki.me</code></td><td><code>404</code>, no redirect</td></tr>
+      <tr><td><code>rdap.org</code> → <code>hibiki.dev</code></td><td><code>302</code> → <code>pubapi.registry.google</code> → <code>200</code></td></tr>
+      <tr><td><code>rdap.org</code> → <code>hibiki.app</code></td><td><code>302</code> → <code>pubapi.registry.google</code> → <code>200</code></td></tr>
+      <tr><td><code>rdap.org</code> → <code>hibikihata.com</code></td><td><code>302</code> → <code>rdap.verisign.com</code> → <code>200</code></td></tr>
+      <tr><td>.me operator RDAP → <code>hibiki.me</code></td><td><code>200</code></td></tr>
+      <tr><td>.me operator RDAP → an unregistered <code>.me</code> name</td><td><code>404</code></td></tr>
+    </tbody>
+  </table>
+  <p>All four names are registered. WHOIS for <code>hibiki.me</code> shows a creation date of 2023-05-06, registrar GMO Internet Group d/b/a Onamae.com, and nameservers at Cloudflare; the RDAP server run by the <code>.me</code> back-end operator, Identity Digital (<code>rdap.identitydigital.services</code>), returns the same nameservers. So the <code>404</code> from <code>rdap.org</code> is a false negative, and the operator's server answers correctly.</p>
+
+  <h2>Why it happens</h2>
+  <p>RDAP clients find the right server through IANA's bootstrap file, <code>https://data.iana.org/rdap/dns.json</code>. In the edition published 2026-09-16, <code>dev</code> and <code>app</code> map to <code>https://pubapi.registry.google/rdap/</code> and <code>com</code> maps to <code>https://rdap.verisign.com/com/v1/</code>. There is no entry for <code>me</code>. <code>.me</code> is a country-code domain (Montenegro), and country-code registries are not obliged to register an RDAP server with IANA the way generic ones are.</p>
+  <p><code>rdap.org</code> only knows the servers listed in that file. When a TLD has no entry, it answers <code>404</code>, which its own documentation gives as the response when it knows of no RDAP service for the name. RFC 9224 says a client in that situation should report an error; <code>rdap.org</code> uses <code>404</code> instead, and <code>404</code> is also what RDAP returns when a registry has no record of a name (RFC 7480 §5.3).</p>
+
+  <h2>How to tell the two apart</h2>
+  <ul>
+    <li>Do not follow redirects on the first request. <code>rdap.org</code> documents <code>302</code> as its response when it knows an authoritative server. A <code>404</code> without a redirect means "no known server", not "not registered".</li>
+    <li>If you follow redirects, look at where you ended up. A <code>404</code> from the registry's own host is a real answer; a <code>404</code> from <code>rdap.org</code> is not.</li>
+    <li>Or check <code>dns.json</code> for the TLD before querying.</li>
+    <li>Treat anything other than <code>200</code> and a registry-issued <code>404</code> as unknown. <code>rdap.org</code> also answers <code>403</code> and <code>429</code> when it limits requests.</li>
+  </ul>
+  <p>Even a real <code>404</code> means "not registered", not "available to register": reserved and blocked names can return <code>404</code> too. Confirm with a registrar before counting on a name.</p>
+
+  <h2>A second trap: local <code>whois</code> on macOS</h2>
+  <p>The obvious fallback has its own hole. The macOS <code>whois</code> command first asks <code>whois.iana.org</code> and then follows the WHOIS server it names for the TLD. For <code>.me</code> that is <code>whois.nic.me</code>, so <code>whois hibiki.me</code> works. For <code>.dev</code> and <code>.app</code>, IANA lists no WHOIS server, so there is nothing to follow, and you get the record for the top-level domain itself. (ICANN dropped the WHOIS requirement for generic TLDs on 28 January 2025, and many registries now offer RDAP only.) For <code>.dev</code> and <code>.app</code>, use RDAP; for <code>.me</code>, use WHOIS. Pick the tool per TLD.</p>
+
+  <h2>Method</h2>
+  <ul>
+    <li>RDAP: <code>curl -s -o /dev/null -w '%{http_code} %{redirect_url}' https://rdap.org/domain/NAME</code>, then again with <code>-L</code> and <code>%{url_effective}</code> to see where the answer came from.</li>
+    <li>Operator RDAP for <code>.me</code>: <code>https://rdap.identitydigital.services/rdap/domain/NAME</code>.</li>
+    <li>WHOIS: <code>whois NAME</code>, reading <code>Creation Date</code>, <code>Registrar</code> and <code>Name Server</code>.</li>
+    <li>Bootstrap: fetch <code>dns.json</code> and search the <code>services</code> array for the TLD.</li>
+    <li>Controls: at least one name per TLD known to be registered, so that a <code>200</code> proves the path works before a <code>404</code> is trusted.</li>
+  </ul>
+</main>
+<footer>
+  <small>© 2026 Hibiki Hata · <a href="/privacy/">Privacy</a></small>
+</footer>
+</body>
+</html>

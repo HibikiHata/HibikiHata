@@ -1,0 +1,2 @@
+# scripts/build-about.mjs が README.md から生成する
+public/about/index.html

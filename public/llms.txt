@@ -1,0 +1,25 @@
+# Hibiki Hata
+
+> Personal site of Hibiki Hata. Curious about where technology is going. I find out by building things, measuring them, and learning.
+
+## Writing
+
+- [rdap.org answers 404 for registered .me domains](https://hibikihata.com/writing/rdap-me-false-negative/): why an RDAP availability check can report a registered .me domain as unregistered, and how to tell the two apart.
+
+## Things I have built
+
+- [core-nexus](https://github.com/HibikiHata/core-nexus): personal productivity plugin for Claude Code
+- [almanac-calendar](https://github.com/HibikiHata/almanac-calendar): deterministic calendar SVG, stdlib only, no external APIs
+- [vault-arcade](https://obsidian.md/plugins?id=vault-arcade): Snake, 2048, Blocks, and Minesweeper inside Obsidian, keyboard or touch, offline
+- [Pirate Flag](https://pirate-flag.vercel.app/): a browser tool for composing flags from parts, with shareable URLs
+
+## About
+
+- [About](https://hibikihata.com/about/)
+- [Contact](https://hibikihata.com/contact/)
+- [GitHub](https://github.com/HibikiHata)
+
+## Optional
+
+- [Privacy](https://hibikihata.com/privacy/)
+- [pinterest-post privacy policy](https://hibikihata.com/projects/pinterest-post/privacy/)

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — pinterest-post — Hibiki Hata</title>
+<meta name="description" content="What the pinterest-post application accesses, stores and transmits, and how to reach its operator.">
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+<header>
+  <a href="/">Hibiki Hata</a>
+  <nav aria-label="Site"><a href="/about/">About</a> · <a href="/contact/">Contact</a></nav>
+</header>
+<main>
+  <h1>Privacy Policy — pinterest-post</h1>
+  <p><small>Effective 2026-09-25</small></p>
+
+  <h2>What this application is</h2>
+  <p><code>pinterest-post</code> is a small program written and operated by Hibiki Hata. It publishes pins from a local queue to the operator's own Pinterest boards on a schedule, and reads the operator's own pin and account analytics. It runs on the operator's computer. It is not offered to other users and has no accounts of its own, so it handles data belonging to one person: its operator.</p>
+
+  <h2>What it accesses</h2>
+  <p>The application authenticates with Pinterest through OAuth and requests exactly these scopes:</p>
+  <ul>
+    <li><code>boards:read</code> — to list the operator's boards</li>
+    <li><code>pins:read</code> — to read pin analytics</li>
+    <li><code>pins:write</code> — to create pins</li>
+    <li><code>user_accounts:read</code> — to read account information and account analytics</li>
+  </ul>
+
+  <h2>What it stores</h2>
+  <p>The OAuth access token and refresh token are stored in a single file on the operator's computer with file mode <code>0600</code>, readable only by the operator's user account. They are transmitted to the Pinterest API and nowhere else. The queue of pins to publish, and the images they reference, are also local files.</p>
+
+  <h2>What it transmits, and to whom</h2>
+  <p>When a pin is published, the application sends one request to the Pinterest API containing:</p>
+  <ul>
+    <li><code>board_id</code> — the destination board</li>
+    <li><code>media_source</code> — the image, <code>base64</code>-encoded, together with its content type</li>
+    <li>and, when supplied for that pin, <code>title</code>, <code>description</code>, <code>alt_text</code> and <code>link</code></li>
+  </ul>
+  <p>The access token travels in the <code>Authorization: Bearer</code> header of each request. Analytics requests send only date ranges, pin identifiers and metric names.</p>
+  <p>Pinterest is the recipient of this data; reaching Pinterest is the purpose of the application. Nothing is sold, and nothing is disclosed to any party other than Pinterest.</p>
+
+  <h2>Deletion requests and questions</h2>
+  <p>Open an issue at <a href="https://github.com/HibikiHata/HibikiHata/issues">github.com/HibikiHata/HibikiHata/issues</a>. Because the application stores only its operator's own data, a deletion request is fulfilled by the operator removing the local files described above.</p>
+
+  <h2>Changes</h2>
+  <p>Revisions to this policy are published at this address with an updated effective date.</p>
+</main>
+<footer>
+  <small>© 2026 Hibiki Hata · <a href="/privacy/">Privacy</a></small>
+</footer>
+</body>
+</html>

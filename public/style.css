@@ -13,7 +13,8 @@ h1, h2 { line-height: 1.3; }
 a { color: #0645ad; }
 img, svg { max-width: 100%; height: auto; }
 table { border-collapse: collapse; width: 100%; }
-th, td { border: 1px solid #ddd; padding: 0.4rem 0.6rem; text-align: left; }
+th, td { border: 1px solid #ddd; padding: 0.4rem 0.6rem; }
+th:not([align]) { text-align: left; }
 code { background: #f4f4f4; padding: 0.1rem 0.3rem; }
 pre { overflow-x: auto; }
 header, footer { font-size: 0.9rem; }

@@ -1,4 +1,4 @@
-// サイトを dist/ に組み立てる。外部ライブラリは使わない（ADR-0021 追補）。
+// サイトを dist/ に組み立てる。外部ライブラリは使わない。
 //   static/     … そのままコピーする素材（CSS・画像・robots.txt 等）
 //   src/layout.html … 全ページ共通の骨格（head・header・footer）。唯一の正本
 //   src/pages/  … ページごとの front matter と <main>
@@ -24,7 +24,12 @@ const ABOUT_META = {
 };
 
 function escapeHtml(value) {
-  return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 // 先頭の <!-- ... --> を "key: value" の front matter として読む
@@ -32,6 +37,7 @@ export function parsePage(source, file) {
   const m = source.match(/^<!--\n([\s\S]*?)\n-->\n/);
   if (!m) throw new Error(`${file}: missing front matter comment at the top`);
   const meta = { type: "website", noindex: false };
+  const seen = new Set();
   for (const line of m[1].split("\n")) {
     if (!line.trim()) continue;
     const i = line.indexOf(": ");
@@ -39,6 +45,8 @@ export function parsePage(source, file) {
     const key = line.slice(0, i);
     const value = line.slice(i + 2).trim();
     if (!KEYS.has(key)) throw new Error(`${file}: unknown front matter key "${key}"`);
+    if (seen.has(key)) throw new Error(`${file}: duplicate front matter key "${key}"`);
+    seen.add(key);
     if (key === "noindex") {
       if (value !== "true") throw new Error(`${file}: noindex must be "true" when present`);
       meta.noindex = true;
@@ -103,6 +111,9 @@ export function sitemapXml(urlPaths) {
 async function listFiles(dir, base = dir) {
   const out = [];
   for (const entry of await readdir(dir, { withFileTypes: true })) {
+    // macOS が勝手に作るファイルは素材でもページでもない。公開もしない。
+    // それ以外のドットファイル（.well-known/ 等）は通常どおり扱い、誤配置は検査で止める
+    if (entry.name === ".DS_Store" || entry.name.startsWith("._")) continue;
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) out.push(...(await listFiles(full, base)));
     else out.push(path.relative(base, full).split(path.sep).join("/"));
@@ -115,7 +126,12 @@ function urlPathOf(rel) {
   if (rel === "404.html") return null;
   if (rel === "index.html") return "/";
   if (!rel.endsWith("/index.html")) throw new Error(`src/pages/${rel}: pages must be named index.html (or 404.html)`);
-  return `/${rel.slice(0, -"index.html".length)}`;
+  const dir = rel.slice(0, -"/index.html".length);
+  // canonical・sitemap にそのまま入るので、エスケープの要らない文字だけを許す
+  if (!dir.split("/").every((seg) => /^[a-z0-9-]+$/.test(seg))) {
+    throw new Error(`src/pages/${rel}: directory names may use only a-z, 0-9 and "-"`);
+  }
+  return `/${dir}/`;
 }
 
 export async function buildSite({ root, outDir = path.join(root, "dist"), fetchImpl, token }) {
@@ -146,6 +162,7 @@ export async function buildSite({ root, outDir = path.join(root, "dist"), fetchI
     if (!rel.endsWith(".html")) throw new Error(`src/pages/${rel}: only .html files belong in src/pages/`);
     const { meta, main } = parsePage(await readFile(path.join(pagesDir, rel), "utf8"), `src/pages/${rel}`);
     const urlPath = urlPathOf(rel);
+    if (urlPath === null && !meta.noindex) throw new Error(`src/pages/${rel}: noindex: true is required (the page has no URL)`);
     await write(rel, renderPage({ layout, meta, main, urlPath }));
     if (!meta.noindex) indexable.push(urlPath);
   }
@@ -165,7 +182,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const { pages, indexable } = await buildSite({ root: process.cwd(), fetchImpl: fetch, token: process.env.GITHUB_TOKEN });
     console.log(`dist/: ${pages} files, ${indexable} pages in sitemap.xml`);
   } catch (err) {
-    console.error(err.message);
+    // 想定外の不具合も追えるよう、スタックごと出す
+    console.error(err instanceof Error ? err.stack : err);
     process.exit(1);
   }
 }

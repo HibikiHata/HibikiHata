@@ -15,6 +15,8 @@ export async function aboutMain({ readme, fetchImpl, token }) {
 
   const res = await fetchImpl("https://api.github.com/markdown", {
     method: "POST",
+    // 応答が無いまま Vercel のビルド上限まで待たないよう、30 秒で打ち切る
+    signal: AbortSignal.timeout(30_000),
     headers,
     body: JSON.stringify({ text: readme, mode: "gfm", context: "HibikiHata/HibikiHata" }),
   });
@@ -26,7 +28,7 @@ export async function aboutMain({ readme, fetchImpl, token }) {
     throw new Error("visitor counter not found exactly once; update the filter");
   }
   body = body.replace(COUNTER, "");
-  if (body.includes("komarev.com")) throw new Error("visitor counter reference remains");
+  if (/komarev\.com/.test(body)) throw new Error("visitor counter reference remains");
 
   // 相対パスの画像は /about/ 配下では解決できないため、リポジトリの raw URL に置き換える
   body = body.replaceAll(

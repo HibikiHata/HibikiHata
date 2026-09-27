@@ -1,9 +1,9 @@
 """サイト共通の OG 画像（1200x630）を生成する。ビルド対象外の手動ツール。
 
-使い方: python3 scripts/make-og.py [出力先]   （既定: public/images/og-v1.png）
+使い方: python3 scripts/make-og.py [出力先]   （既定: static/images/og-v1.png）
 依存: Pillow と macOS 標準の Helvetica Neue。Vercel のビルドでは実行しない。
 X はカード画像を数日キャッシュするため、デザインを変えたら出力名の版（og-v2.png 等）を上げ、
-各ページ（と scripts/build-about.mjs）の og:image も合わせて書き換えること。
+scripts/build.mjs の OG_IMAGE も合わせて書き換えること。
 """
 import sys
 
@@ -30,7 +30,7 @@ def draw_mark(draw: ImageDraw.ImageDraw, x: int, y: int, size: int) -> None:
 
 
 def main() -> None:
-    out = sys.argv[1] if len(sys.argv) > 1 else "public/images/og-v1.png"
+    out = sys.argv[1] if len(sys.argv) > 1 else "static/images/og-v1.png"
     img = Image.new("RGB", (W, H), BG)
     draw = ImageDraw.Draw(img)
 

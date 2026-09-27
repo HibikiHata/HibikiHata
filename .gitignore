@@ -1,2 +1,2 @@
-# scripts/build-about.mjs が README.md から生成する
-public/about/index.html
+# scripts/build.mjs が static/ と src/ から組み立てる生成物
+dist/

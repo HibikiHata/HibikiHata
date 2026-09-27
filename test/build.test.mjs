@@ -136,7 +136,10 @@ test("renderPage: 追加のスタイルシートを style.css より前に置く
     urlPath: "/about/",
     stylesheets: ["/github-markdown.css"],
   });
-  assert.ok(html.indexOf('href="/github-markdown.css"') < html.indexOf('href="/style.css"'));
+  const extra = html.indexOf('<link rel="stylesheet" href="/github-markdown.css">');
+  const base = html.indexOf('<link rel="stylesheet" href="/style.css">');
+  assert.ok(extra !== -1 && base !== -1, "both stylesheets must be present");
+  assert.ok(extra < base);
 });
 
 test("renderPage: 属性と title の値を HTML エスケープする", () => {
@@ -294,4 +297,181 @@ test("実サイト: 全ページが不変条件を満たす", async (t) => {
   for (const asset of ["style.css", "github-markdown.css", "favicon.svg", "robots.txt", "llms.txt", "images/og-v1.png"]) {
     await readFile(path.join(outDir, asset));
   }
+});
+
+// ---------- 追加: 失敗パスと契約（2026-09-27 レビュー反映） ----------
+
+import { spawnSync } from "node:child_process";
+
+const BUILD_SCRIPT = path.join(REPO, "scripts/build.mjs");
+
+test("parsePage: 同じキーが2回あると失敗する", () => {
+  assert.throws(() => parsePage("<!--\ntitle: A\ntitle: B\ndescription: D\n-->\n<main></main>\n", "x.html"), /duplicate.*title/);
+});
+
+test("parsePage: key: value 形式でない行は失敗する", () => {
+  assert.throws(() => parsePage("<!--\ntitle: T\ndescription: D\njust text\n-->\n<main></main>\n", "x.html"), /malformed/);
+});
+
+test("parsePage: noindex は true 以外を受け付けない", () => {
+  assert.throws(() => parsePage("<!--\ntitle: T\ndescription: D\nnoindex: false\n-->\n<main></main>\n", "x.html"), /noindex/);
+});
+
+test("renderPage: シングルクォートもエスケープする", () => {
+  const html = renderPage({ layout: LAYOUT, meta: { ...META, title: "it's" }, main: "<main></main>", urlPath: "/x/" });
+  assert.ok(html.includes("<title>it&#39;s</title>"));
+  assert.ok(html.includes('<meta property="og:title" content="it&#39;s">'));
+});
+
+test("renderPage: 共有用の固定 meta とアイコンをすべて出す", () => {
+  const html = renderPage({ layout: LAYOUT, meta: META, main: "<main></main>", urlPath: "/contact/" });
+  for (const tag of [
+    '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
+    '<meta property="og:site_name" content="Hibiki Hata">',
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="630">',
+    '<meta property="og:image:type" content="image/png">',
+    '<meta property="og:image:alt" content="Hibiki Hata, hibikihata.com">',
+    '<meta name="twitter:site" content="@00001Neo">',
+    '<meta name="twitter:image:alt" content="Hibiki Hata, hibikihata.com">',
+  ]) {
+    assert.ok(html.includes(tag), tag);
+  }
+});
+
+test("aboutMain: GitHub Markdown API を決まった内容で呼び、トークンがあれば Bearer で渡す", async () => {
+  const calls = [];
+  const spy = async (url, options) => {
+    calls.push({ url, options });
+    return { ok: true, status: 200, text: async () => `<p>x</p>${COUNTER}` };
+  };
+  await aboutMain({ readme: "# Readme", fetchImpl: spy, token: "t0ken" });
+  await aboutMain({ readme: "# Readme", fetchImpl: spy });
+  const [withToken, withoutToken] = calls;
+  assert.equal(withToken.url, "https://api.github.com/markdown");
+  assert.equal(withToken.options.method, "POST");
+  assert.equal(withToken.options.headers.Accept, "application/vnd.github+json");
+  assert.equal(withToken.options.headers["Content-Type"], "application/json");
+  assert.equal(withToken.options.headers["User-Agent"], "hibikihata.com-build");
+  assert.deepEqual(JSON.parse(withToken.options.body), { text: "# Readme", mode: "gfm", context: "HibikiHata/HibikiHata" });
+  assert.equal(withToken.options.headers.Authorization, "Bearer t0ken");
+  assert.equal(withoutToken.options.headers.Authorization, undefined);
+});
+
+test("aboutMain: 応答待ちに上限を設ける（AbortSignal を渡す）", async () => {
+  let signal;
+  await aboutMain({
+    readme: "x",
+    fetchImpl: async (_url, options) => {
+      signal = options.signal;
+      return { ok: true, status: 200, text: async () => `<p>x</p>${COUNTER}` };
+    },
+  });
+  assert.ok(signal instanceof AbortSignal);
+});
+
+test("aboutMain: 大文字の <SCRIPT> も拒否する", async () => {
+  await assert.rejects(aboutMain({ readme: "x", fetchImpl: fakeFetch(`<SCRIPT>x</SCRIPT>${COUNTER}`) }), /script/);
+});
+
+test("aboutMain: href の相対パスも raw URL に置き換える", async () => {
+  const main = await aboutMain({ readme: "x", fetchImpl: fakeFetch(`<a href="assets/file.png">f</a>${COUNTER}`) });
+  assert.ok(main.includes('href="https://raw.githubusercontent.com/HibikiHata/HibikiHata/main/assets/file.png"'));
+});
+
+test("aboutMain: カウンター除去後も komarev.com の参照が残れば失敗する", async () => {
+  await assert.rejects(
+    aboutMain({ readme: "x", fetchImpl: fakeFetch(`${COUNTER}<img src="https://komarev.com/other">`) }),
+    /counter reference remains/,
+  );
+});
+
+test("buildSite: 出力したファイル数と sitemap のページ数を返す", async (t) => {
+  const root = await fixtureSite(t);
+  const result = await buildSite({ root, fetchImpl: fakeFetch(`<p>Hi</p>${COUNTER}`) });
+  // static 2 + ページ 3 + about + sitemap
+  assert.deepEqual(result, { pages: 7, indexable: 3 });
+});
+
+test("buildSite: 404.html に noindex が無いと失敗する", async (t) => {
+  const root = await fixtureSite(t);
+  await put(root, "src/pages/404.html", "<!--\ntitle: Not found\ndescription: D\n-->\n<main>404</main>\n");
+  await assert.rejects(buildSite({ root, fetchImpl: fakeFetch(`<p>Hi</p>${COUNTER}`) }), /404\.html.*noindex/);
+});
+
+test("buildSite: index.html 以外の名前のページは失敗する", async (t) => {
+  const root = await fixtureSite(t);
+  await put(root, "src/pages/contact.html", "<!--\ntitle: T\ndescription: D\n-->\n<main></main>\n");
+  await assert.rejects(buildSite({ root, fetchImpl: fakeFetch(`<p>Hi</p>${COUNTER}`) }), /contact\.html.*index\.html/);
+});
+
+test("buildSite: src/pages に .html 以外があると失敗する", async (t) => {
+  const root = await fixtureSite(t);
+  await put(root, "src/pages/note.txt", "memo");
+  await assert.rejects(buildSite({ root, fetchImpl: fakeFetch(`<p>Hi</p>${COUNTER}`) }), /note\.txt/);
+});
+
+test("buildSite: src/pages/about/ は生成される About と重なるので失敗する", async (t) => {
+  const root = await fixtureSite(t);
+  await put(root, "src/pages/about/index.html", "<!--\ntitle: T\ndescription: D\n-->\n<main></main>\n");
+  await assert.rejects(buildSite({ root, fetchImpl: fakeFetch(`<p>Hi</p>${COUNTER}`) }), /collision.*about\/index\.html/);
+});
+
+test("buildSite: URL に使えない文字を含むページのパスは失敗する", async (t) => {
+  const root = await fixtureSite(t);
+  await put(root, "src/pages/Bad Name/index.html", "<!--\ntitle: T\ndescription: D\n-->\n<main></main>\n");
+  await assert.rejects(buildSite({ root, fetchImpl: fakeFetch(`<p>Hi</p>${COUNTER}`) }), /Bad Name/);
+});
+
+test("buildSite: .DS_Store などのドットファイルは無視し、公開もしない", async (t) => {
+  const root = await fixtureSite(t);
+  await put(root, "src/pages/.DS_Store", "junk");
+  await put(root, "static/.DS_Store", "junk");
+  await put(root, "static/images/.DS_Store", "junk");
+  await buildSite({ root, fetchImpl: fakeFetch(`<p>Hi</p>${COUNTER}`) });
+  const out = await readdir(path.join(root, "dist"), { recursive: true });
+  assert.ok(!out.some((p) => p.split(path.sep).pop().startsWith(".")), out.join(","));
+});
+
+test("CLI: 異常があれば終了コード 1 で止まり、理由を stderr に出す", async (t) => {
+  const root = await fixtureSite(t);
+  await put(root, "static/contact/index.html", "<p>stale</p>");
+  const run = spawnSync(process.execPath, [BUILD_SCRIPT], { cwd: root, encoding: "utf8" });
+  assert.equal(run.status, 1);
+  assert.match(run.stderr, /static\/contact\/index\.html/);
+});
+
+// ---------- 追加: 最終レビュー反映（2026-09-27） ----------
+
+test("buildSite: .well-known/ などのドットディレクトリは公開する", async (t) => {
+  const root = await fixtureSite(t);
+  await put(root, "static/.well-known/security.txt", "Contact: x");
+  await buildSite({ root, fetchImpl: fakeFetch(`<p>Hi</p>${COUNTER}`) });
+  assert.equal(await readFile(path.join(root, "dist/.well-known/security.txt"), "utf8"), "Contact: x");
+});
+
+test("buildSite: ドットで始まる HTML を static/ に置いても黙って消さず失敗する", async (t) => {
+  const root = await fixtureSite(t);
+  await put(root, "static/.old-page.html", "<p>old</p>");
+  await assert.rejects(buildSite({ root, fetchImpl: fakeFetch(`<p>Hi</p>${COUNTER}`) }), /\.old-page\.html/);
+});
+
+test("buildSite: macOS の ._ ファイルも無視する", async (t) => {
+  const root = await fixtureSite(t);
+  await put(root, "src/pages/._index.html", "junk");
+  await buildSite({ root, fetchImpl: fakeFetch(`<p>Hi</p>${COUNTER}`) });
+  assert.ok(!(await readdir(path.join(root, "dist"))).includes("._index.html"));
+});
+
+test("aboutMain: タイムアウトは 30 秒", async (t) => {
+  const timeout = t.mock.method(AbortSignal, "timeout");
+  await aboutMain({ readme: "x", fetchImpl: fakeFetch(`<p>x</p>${COUNTER}`) });
+  assert.deepEqual(timeout.mock.calls.map((c) => c.arguments), [[30_000]]);
+});
+
+test("CLI: 失敗時はスタックトレースも出す", async (t) => {
+  const root = await fixtureSite(t);
+  await put(root, "static/contact/index.html", "<p>stale</p>");
+  const run = spawnSync(process.execPath, [BUILD_SCRIPT], { cwd: root, encoding: "utf8" });
+  assert.match(run.stderr, /\n\s+at .*build\.mjs/);
 });

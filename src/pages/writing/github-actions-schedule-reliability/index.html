@@ -1,0 +1,50 @@
+<!--
+title: GitHub Actions schedules ran hours late, and an hourly one rarely ran — Hibiki Hata
+description: Three months of run records from my own repositories: daily schedules ran every day but hours late, an hourly schedule ran about once every six or seven hours, and an external cron calling workflow_dispatch ran every hour.
+type: article
+-->
+<main>
+  <h1>GitHub Actions schedules ran hours late, and an hourly one rarely ran</h1>
+  <p><small>Last updated 2026-11-12</small></p>
+
+  <p><strong>Conclusion.</strong> Do not rely on the <code>schedule</code> event for anything that has to happen at a given time. In my repositories, two daily schedules ran every day for over three months, but always late: usually by two to four hours, and by up to more than nine. An hourly schedule in another repository ran only about once every six or seven hours. When a Cloudflare Worker called <code>workflow_dispatch</code> on a cron instead, a run started every hour at the minute it was asked for. Separately, two public repositories whose default branch had not changed for 83 days still had their schedules enabled, so an unchanged default branch alone does not trigger the 60-day rule.</p>
+
+  <h2>Evidence</h2>
+  <p>From the run records of the Actions REST API, measured 2026-11-12. "Late" means the time between the cron time and the moment GitHub created the run (<code>created_at</code>).</p>
+  <table>
+    <thead><tr><th>Schedule</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Daily, public repo A, Aug 11 – Nov 11</td><td>Ran on all 93 days. Late by 25 min to 8 h, usually 2–3 h</td></tr>
+      <tr><td>Daily, public repo B, Jul 30 – Nov 11</td><td>Ran on all 105 days. Late by about 30 min to over 9 h, usually 3–4 h</td></tr>
+      <tr><td>Four times a day, public repo C, Aug 2 – Nov 11</td><td>406 runs in 102 days, four a day on 99 of them. Delay not measured (see Method)</td></tr>
+      <tr><td>Hourly, private repo, Nov 3 – Nov 12</td><td>31 runs in about 200 hours: roughly one every six or seven hours</td></tr>
+      <tr><td><code>workflow_dispatch</code> from a Cloudflare Worker cron, same private repo, Nov 9 – Nov 12</td><td>A run in every one of 65 hours, at the requested minute</td></tr>
+    </tbody>
+  </table>
+  <p>GitHub's documentation allows for all of this. It says a <code>schedule</code> event "can be delayed during periods of high loads", that "high load times include the start of every hour", and that "if the load is sufficiently high enough, some queued jobs may be dropped". Its advice is to schedule at another minute of the hour. Repo A runs at <code>:10</code>, and the hourly schedule never used minute <code>:00</code> (it ran at <code>:07</code>, <code>:37</code> and <code>:25</code>). Both were still late or mostly missing.</p>
+  <p>The daily jobs arrived late. The hourly one mostly did not arrive. A missing hour leaves nothing in the run list: no failed or cancelled run takes its place. I don't know why those runs disappeared instead of arriving late.</p>
+
+  <h2>What I did instead: call <code>workflow_dispatch</code> from outside</h2>
+  <p>An external scheduler can start a run with a <code>POST</code> to <code>/repos/OWNER/REPO/actions/workflows/WORKFLOW/dispatches</code>. Since 2026-02-19, setting <code>"return_run_details": true</code> in the request body makes the endpoint answer <code>200</code> with <code>workflow_run_id</code>, <code>run_url</code> and <code>html_url</code>. Without it, the answer is <code>204</code> with an empty body. With the ID, the caller can record which run it started.</p>
+  <ul>
+    <li>Any scheduler with a reliable clock will work. I used a Cloudflare Worker with a Cron Trigger, so I don't have to run a server.</li>
+    <li>The token is a fine-grained personal access token for that one repository only, with Actions: Read and write and an expiry date. It is stored as a Worker secret, not in code.</li>
+    <li>I kept the <code>schedule</code> event as a fallback at a different minute. The job must therefore be safe to start twice. Mine uses a <code>concurrency</code> group and checks what has already been done.</li>
+    <li>To check that the Worker is still triggering runs, count only <code>workflow_dispatch</code> runs. If you also count the fallback schedule, a dead Worker goes unnoticed.</li>
+  </ul>
+
+  <h2>The 60-day rule</h2>
+  <p>The documentation says: "In a public repository, scheduled workflows are automatically disabled when no repository activity has occurred in 60 days." In two of the public repositories above, the last commit on the default branch was on 2026-08-21. On 2026-11-12, 83 days later, their scheduled workflows were still <code>active</code>. Both workflows force-push their output to a separate <code>output</code> branch every day, and both repositories have Dependabot branches. So these repositories were not inactive. All this shows is that an unchanged default branch is not enough to disable a schedule. Which kind of activity counts is not documented, and I could not test it from here. Check the workflow's <code>state</code> through the API, and give every scheduled workflow a <code>workflow_dispatch</code> trigger so you can run it by hand.</p>
+
+  <h2>Method</h2>
+  <ul>
+    <li>Runs: <code>gh api --paginate "repos/OWNER/REPO/actions/workflows/FILE/runs?event=schedule&amp;per_page=100"</code>, reading <code>created_at</code>. The same with <code>event=workflow_dispatch</code> for the Worker's runs.</li>
+    <li>Delay: each run's <code>created_at</code> minus the cron time it belongs to. Measured only for schedules that run once a day, where each run clearly belongs to one cron time. On the four-a-day schedule, delays of several hours make some runs impossible to match to a cron time, so only the count is given.</li>
+    <li>Hourly window: from the first to the last scheduled run (Nov 3 17:42 to Nov 12 01:36 UTC). The cron minute was changed twice during this window (<code>:07</code>, <code>:37</code>, then <code>:25</code>).</li>
+    <li>Workflow state: <code>gh api repos/OWNER/REPO/actions/workflows</code>, reading <code>state</code>. Last default-branch commit: <code>gh api "repos/OWNER/REPO/commits?sha=main&amp;per_page=1"</code>.</li>
+    <li>Sources: <a href="https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule">GitHub Docs, Events that trigger workflows: <code>schedule</code></a>. <a href="https://github.blog/changelog/2026-02-19-workflow-dispatch-api-now-returns-run-ids">GitHub Changelog, 2026-02-19: Workflow dispatch API now returns run IDs</a>.</li>
+  </ul>
+  <aside class="share" aria-label="Share">
+    <a class="xbtn primary" href="https://x.com/intent/tweet?url=https%3A%2F%2Fhibikihata.com%2Fwriting%2Fgithub-actions-schedule-reliability%2F&amp;via=00001Neo" target="_blank" rel="noopener">Discuss on<svg viewBox="0 0 24 24" role="img" aria-label="X"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+  </aside>
+</main>

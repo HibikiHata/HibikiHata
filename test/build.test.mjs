@@ -281,6 +281,7 @@ test("実サイト: 全ページが不変条件を満たす", async (t) => {
     "https://hibikihata.com/contact/",
     "https://hibikihata.com/privacy/",
     "https://hibikihata.com/projects/pinterest-post/privacy/",
+    "https://hibikihata.com/writing/automated-kept-running/",
     "https://hibikihata.com/writing/github-actions-schedule-reliability/",
     "https://hibikihata.com/writing/rdap-me-false-negative/",
   ]);

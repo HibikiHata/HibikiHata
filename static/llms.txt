@@ -4,7 +4,7 @@
 
 ## Writing
 
-- [Everything I automated kept running. Everything I had to type in myself stopped.](https://hibikihata.com/writing/automated-kept-running/): why my own records stopped even with a reminder in place, and three rules I now design habits by.
+- [What runs by itself keeps going. What depends on you stops.](https://hibikihata.com/writing/automated-kept-running/): why habits stop where a system asks too much, why a reminder rarely fixes it, and three rules for designing habits instead of forcing them.
 - [GitHub Actions schedules ran hours late, and an hourly one rarely ran](https://hibikihata.com/writing/github-actions-schedule-reliability/): three months of run records from my own repositories, calling workflow_dispatch from an external cron instead, and what an unchanged default branch does not do to the 60-day rule.
 - [rdap.org answers 404 for registered .me domains](https://hibikihata.com/writing/rdap-me-false-negative/): why an RDAP availability check can report a registered .me domain as unregistered, and how to tell the two apart.
 

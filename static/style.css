@@ -1,8 +1,42 @@
+/*
+  Spacing and type scale: two strands built from 16px with the golden ratio (phi ~ 1.618),
+  the same idea as a red/blue proportional scale.
+  - red  r1..r8 = 16/phi^3 .. 16*phi^4 = 3.8, 6.1, 9.9, 16, 25.9, 41.9, 67.8, 109.7 px
+  - blue b1..b6 = 2 x red             = 7.6, 12.2, 19.8, 32, 51.8, 83.8 px
+  Every value is rounded once, here, to the nearest 4px, with two exceptions:
+  9.9 goes up to 12 (nearest is 8, which r2 already holds) and 109.7 goes to 108
+  (110 is off the 4px grid). Pick the nearest token; do not add raw px elsewhere.
+  Type: body text steps by 1.25 (12.8, 16, 20, 25, 31.25 px); display numbers step by phi (16, 26, 42 px).
+*/
+:root {
+  --space-r1: 0.25rem;   /*   4px */
+  --space-r2: 0.5rem;    /*   8px */
+  --space-r3: 0.75rem;   /*  12px */
+  --space-r4: 1rem;      /*  16px */
+  --space-r5: 1.5rem;    /*  24px */
+  --space-r6: 2.5rem;    /*  40px */
+  --space-r7: 4.25rem;   /*  68px */
+  --space-r8: 6.75rem;   /* 108px */
+  --space-b1: 0.5rem;    /*   8px */
+  --space-b2: 0.75rem;   /*  12px */
+  --space-b3: 1.25rem;   /*  20px */
+  --space-b4: 2rem;      /*  32px */
+  --space-b5: 3.25rem;   /*  52px */
+  --space-b6: 5.25rem;   /*  84px */
+  --text-small: 0.8rem;  /* 12.8px = 16 / 1.25 */
+  --text-0: 1rem;        /* 16px */
+  --text-1: 1.25rem;     /* 20px */
+  --text-2: 1.5625rem;   /* 25px */
+  --text-3: 1.953125rem; /* 31.25px */
+  --display-0: 1rem;     /* 16px */
+  --display-1: 1.625rem; /* 26px ~ 16 * phi */
+  --display-2: 2.625rem; /* 42px ~ 16 * phi^2 */
+}
 html { font-size: 100%; scrollbar-gutter: stable; }
 body {
   max-width: 42rem;
   margin: 0 auto;
-  padding: 1.5rem 1rem 4rem;
+  padding: var(--space-r5) var(--space-r4) var(--space-r7);
   line-height: 1.7;
   overflow-wrap: break-word;
   font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", sans-serif;
@@ -10,22 +44,25 @@ body {
   background: #fff;
 }
 h1, h2 { line-height: 1.3; }
+h1 { font-size: var(--text-3); }
+h2 { font-size: var(--text-2); }
 a { color: #0645ad; }
 img, svg { max-width: 100%; height: auto; }
 table { border-collapse: collapse; width: 100%; }
-th, td { border: 1px solid #ddd; padding: 0.4rem 0.6rem; }
+th, td { border: 1px solid #ddd; padding: var(--space-r2); }
 th:not([align]) { text-align: left; }
-code { background: #f4f4f4; padding: 0.1rem 0.3rem; }
+code { background: #f4f4f4; padding: 0 var(--space-r1); }
 pre { overflow-x: auto; }
-header, footer { font-size: 0.9rem; }
-header { display: flex; flex-wrap: wrap; align-items: center; row-gap: 0.5rem; }
+header, footer { font-size: var(--text-small); }
+footer small { font-size: inherit; }
+header { display: flex; flex-wrap: wrap; align-items: center; row-gap: var(--space-r2); }
 header .follow { margin-left: auto; }
-header nav::before { content: "·"; margin: 0 0.3em; }
-header h1 { font-size: 2rem; margin: 0; }
-footer { margin-top: 3rem; border-top: 1px solid #eee; padding-top: 1rem; text-align: center; color: #767676; }
+header nav::before { content: "·"; margin: 0 var(--space-r1); }
+header h1 { margin: 0; }
+footer { margin-top: var(--space-b5); border-top: 1px solid #eee; padding-top: var(--space-r4); text-align: center; color: #767676; }
 footer a { color: inherit; }
-.share { margin-top: 2.5rem; }
-.xbtn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.75rem; border: 1px solid #1a1a1a; border-radius: 999px; color: #1a1a1a; font-size: 0.85rem; font-weight: 600; line-height: 1.2; text-decoration: none; }
+.share { margin-top: var(--space-r6); }
+.xbtn { display: inline-flex; align-items: center; gap: var(--space-r2); padding: var(--space-r1) var(--space-r3); border: 1px solid #1a1a1a; border-radius: 999px; color: #1a1a1a; font-size: var(--text-small); font-weight: 600; line-height: 1.2; text-decoration: none; }
 .xbtn:hover { background: #f4f4f4; }
 .xbtn.primary { background: #1a1a1a; color: #fff; }
 .xbtn.primary:hover { background: #333; }
